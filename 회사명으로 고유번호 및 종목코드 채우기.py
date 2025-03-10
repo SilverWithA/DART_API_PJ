@@ -86,12 +86,10 @@ df = pd.read_csv('대기업집단 지주 및 지주격 회사 리스트.csv')
 df['고유번호'] = df['기업명'].apply(find_corp_num)
 
 # 고유번호로
-find_stock_code(df)
-# df['종목코드'] = df['기업명'].apply(find_stock_code)
+df['종목코드'] = df['고유번호'].apply(find_stock_code)
+
 # 종목코드 보충하기
 supplement_stock_code(df,'종목코드','기업명')
+
 # xlsx 파일로 저장(csv로 저장시 숫자형 데이터로 자동변환 문제 有)
 df.to_excel('대기업집단 지주 및 지주격 회사 리스트 (고유번호 및 종목코드 포함).xlsx', index=False)
-
-# 실행 코드
-make_holdings_list()

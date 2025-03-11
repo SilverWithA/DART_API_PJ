@@ -4,11 +4,19 @@ import library
 # 회사명으로 고유번호를 찾는 매서드
 def find_corp_num(find_name):
     """회사명으로 고유번호 찾기
-        find_name = 고유번호를 찾고자하는 회사명"""
+        find_name = 고유번호를 찾고자하는 회사명
 
+        (리팩토링 필요) 이유: 1개에 사명으로 2개이상의 고유번호가 return되는 경우"""
+    cnt = 0
+    corp_code_list = []
     for country in root.iter("list"):
         if country.findtext("corp_name") == find_name:
-            return country.findtext("corp_code")
+            cnt += 1
+            corp_code_list.append(country.findtext("corp_code"))
+    if cnt > 1:
+        return corp_code_list
+    elif cnt == 1:
+        return corp_code_list[0]
 
 # 고유코드로 종목 코드 찾는 매서드
 def find_stock_code(corp_code):

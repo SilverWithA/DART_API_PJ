@@ -2,7 +2,7 @@
 
 ### 1. 데이터 불러오기
 # 30대그룹 데이터 불러오기(불러오기 전 컬럼 별 타입 지정 필요)
-group30_df = pd.read_excel('2024 대규모기업집단 현황(고유번호 및 종목코드 포함).xlsx',
+group88_df = pd.read_excel('2024 대규모기업집단 현황(고유번호 및 종목코드 포함).xlsx',
                            dtype={
                                "연번": int,
                                "법인등록번호": str,
@@ -19,6 +19,7 @@ com500_df = pd.read_excel('2024년 기준 500대 기업(고유번호 및 종목�
 
 # 2024년기준 사업보고서 제출 여부 확인 ---------------------------
 
+## 매서드 정의
 # 제출한 공시 보고서 조회하는 매서드
 def collect_anuual_report_list(df):
     """기업 고유번호를 기반으로 사업보고서 제출 여부를 확인하는 매서드
@@ -36,12 +37,10 @@ def collect_anuual_report_list(df):
             continue
 
         params = {"crtfc_key": api_key,
-            "corp_code": str(corp_code),
+            "corp_code": str(corp_code).replace(" " , ""),
             "bgn_de":   '20240101',
             "end_de":'20250304',
-            "last_reprt_at": 'Y',
-            "pblntf_ty": 'A',   #정기보고서만 조회하기
-            "corp_cls": 'Y',
+            "pblntf_detail_ty": 'A001',   #사업보고서만 조회 # https://dart-fss.readthedocs.io/en/latest/dart_types.html
             "page_no": '1',
             "page_count": '100'
         }
@@ -51,41 +50,49 @@ def collect_anuual_report_list(df):
 
         if data['message'] == '조회된 데이타가 없습니다.': #데이타 ㅎ
             continue
+        try:
+            new_data = pd.DataFrame(data["list"]) # dictionary to df 변환
+            res_df = pd.concat([res_df, new_data], ignore_index=True)
+        except Exception as e:
+            print("에러 발생: ",e, "에러 발생 구역의 고유번호: ",corp_code)
 
-        new_data = pd.DataFrame(data["list"]) # dictionary to df 변환
-
-        # 계속 df에 새로 불러온 정보를 불러와서 concat해주며 데이터 추가
-        res_df = pd.concat([res_df,new_data], ignore_index=True)
     print("정기 보고서 불러오기 작업 완료----------------------------------")
 
     return res_df
-
-# 500대 기업 사업보고서 제출 기업 찾기
-res.df = collect_anuual_report_list(com500_df)
-res_df.to_excel('2024년 500대그룹 및 계열사 정기보고서.xlsx')    # 중간 저장
-
-# 사업보고서 필터링
-    # 불필요한 문자 제거 (정규식 사용)
-        # 1. 대괄호로 묶인 문자열 제거 ex) [기재정정], [첨부정정] => \[.*?\]
-        # 2. 괄호로 묶인 문자열 제거 ex) (2024.09) => \(.*?\)
-
-res_df["report_nm"] = res_df["report_nm"].str.replace(r"\[.*?\]|\(.*?\)", "", regex=True).str.strip()
-
-
-# 사업보고서 항목만 남기기
-res_df = res_df[res_df["report_nm"] == "사업보고서"]
-
-# 중복행 삭제
-# res_df = res_df.drop_duplicates(subset=["corp_name","report_nm","rcept_dt"])
-
-
-com500_df['사업보고서 제출 여부'] = com500_df['고유번호'].apply(is_company_anuual_repot)
-# com500_df = com500_df.drop("사업보고서 제출 여부", axis=1)
-
+# 사업보고서 제출 여부 확인 매서드
 def is_company_anuual_repot(corp_code):
-    if str(corp_code) in res_df["corp_code"].unique():
+    if str(corp_code) in anual_report_list_group88_df["corp_code"].unique():
         return "●"
     else:
         return "-"
-com500_df.to_excel('2024년 기준 500대 기업(고유번호 및 종목코드, 사업보고서 제출 여부 포함).xlsx.xlsx')
-res_df.to_excel('2024년 500대그룹 및 계열사 사업보고서.xlsx')
+
+
+def exe_find_anual_reporting_comp500():
+    """500대 기업 중 사업보고서 제출사 찾기"""
+    # 500대 기업 사업보고서 제출 기업 찾기
+    res_df = collect_anuual_report_list(com500_df)
+
+    # 사업보고서 필터링
+        # 불필요한 문자 제거 (정규식 사용)
+            # 1. 대괄호로 묶인 문자열 제거 ex) [기재정정], [첨부정정] => \[.*?\]
+            # 2. 괄호로 묶인 문자열 제거 ex) (2024.09) => \(.*?\)
+    res_df["report_nm"] = res_df["report_nm"].str.replace(r"\[.*?\]|\(.*?\)", "", regex=True).str.strip()
+
+    res_df.to_excel('2024년 500대그룹 및 계열사 정기보고서.xlsx')    # 중간 저장
+
+
+    com500_df['사업보고서 제출 여부'] = com500_df['고유번호'].apply(is_company_anuual_repot)
+
+    # 데이터 최종 저장
+    com500_df.to_excel('2024년 기준 500대 기업(고유번호 및 종목코드, 사업보고서 제출 여부 포함).xlsx')
+    res_df.to_excel('2024년 500대그룹 및 계열사 사업보고서.xlsx')
+
+def exe_find_anual_reporting_group30():
+    anual_report_list_group88_df = collect_anuual_report_list(group88_df)
+    anual_report_list_group88_df["report_nm"] = anual_report_list_group88_df["report_nm"].str.replace(r"\[.*?\]|\(.*?\)", "", regex=True).str.strip()
+
+    group88_df['사업보고서 제출 여부'] = group88_df['고유번호'].apply(is_company_anuual_repot)
+
+    # 데이터 최종 저장
+    group88_df.to_excel('2024년 기준 대규모기업집단 계열사(고유번호 및 종목코드, 사업보고서 제출 여부 포함).xlsx')
+    anual_report_list_group88_df.to_excel('2024년 기준 대규모기업집단 계열사 사업보고서.xlsx')

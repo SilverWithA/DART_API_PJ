@@ -1,7 +1,6 @@
-# 참고: https://coding-kindergarten.tistory.com/97
-import os.path
+# 참고: https://yogyui.tistory.com/entry/%EA%B8%88%EC%9C%B5%EA%B0%90%EB%8F%85%EC%9B%90OPENDART-%EC%A0%84%EC%9E%90%EA%B3%B5%EC%8B%9C-Open-API-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0
 import zipfile
-import os
+
 
 # 조회할 공시 보고서의 접수번호가 필요함
 # 사업보고서 제출 확인.py에서 참고(매서드 만들기)
@@ -47,7 +46,7 @@ def collect_statement_list(df, start_date, end_date,pblntf_detail_ty):
 url = 'https://opendart.fss.or.kr/api/document.xml'
 
 params = {"crtfc_key": api_key, "rcept_no": '20250218001524'}
-doc_zip_path = os.path.abspath('./원본파일.zip')
+doc_zip_path = os.path.abspath('./공시보고서_원본파일.zip')
 
 if not os.path.isfile(doc_zip_path):
     res = requests.get(url, params=params)
@@ -55,6 +54,20 @@ if not os.path.isfile(doc_zip_path):
         f.write(res.content)
 
 
-zf = zipfile.ZipFile(doc_zip_path)
+zf = ZipFile(doc_zip_path)
 zf.extractall()
+
+target_xml_filename = '20250218001524.xml"'
+
+with ZipFile(doc_zip_path, 'r') as z:
+    if target_xml_filename in z.namelist():
+        with open(target_xml_filename, 'rb') as f:
+            xml_memory = io.BytesIO(f.read())
+
+            # xml 파싱
+            tree = ET.parse(xml_memory)
+            root = tree.getroot()
+
+
+
 

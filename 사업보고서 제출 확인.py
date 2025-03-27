@@ -1,21 +1,29 @@
 
 
 ### 1. 데이터 불러오기
-# 30대그룹 데이터 불러오기(불러오기 전 컬럼 별 타입 지정 필요)
-group88_df = pd.read_excel('2024 대규모기업집단 현황(고유번호 및 종목코드 포함).xlsx',
-                           dtype={
-                               "연번": int,
-                               "법인등록번호": str,
-                               "고유번호": str
-                               ,"종목코드": str})
+def test_df():
+    # 30대그룹 데이터 불러오기(불러오기 전 컬럼 별 타입 지정 필요)
+    group88_df = pd.read_excel('2024 대규모기업집단 현황(고유번호 및 종목코드 포함).xlsx',
+                               dtype={
+                                   "연번": int,
+                                   "법인등록번호": str,
+                                   "고유번호": str
+                                   ,"종목코드": str})
 
 
-# 500대기업 데이터 불러오기(고유번호 등 컬럼 문자형으로 지정해주기)
-com500_df = pd.read_excel('2024년 기준 500대 기업(고유번호 및 종목코드 포함).xlsx',
-                        dtype={"순위":int,
+    # 500대기업 데이터 불러오기(고유번호 등 컬럼 문자형으로 지정해주기)
+    com500_df = pd.read_excel('2024년 기준 500대 기업(고유번호 및 종목코드 포함).xlsx',
+                            dtype={"순위":int,
+                                   "종목코드":str,
+                                   "고유번호":str})
+
+    group30_df = pd.read_excel('2024년 30대그룹 집단 계열사.xlsx', sheet_name='2024년 30대그룹 계열사(고유번호 및 종목코드 포함)',)
+
+
+    df = pd.read_excel('2024 88개 대규모기업집단 계열사.xlsx', sheet_name = '2024 대규모기업집단 계열사',
+                       dtype={"연번":int,
                                "종목코드":str,
                                "고유번호":str})
-
 
 # 2024년기준 사업보고서 제출 여부 확인 ---------------------------
 
@@ -60,12 +68,25 @@ def collect_anuual_report_list(df):
 
     return res_df
 # 사업보고서 제출 여부 확인 매서드
+
+# 2024년 사업보고서 제출한 고유번호 리스트
+res_df = collect_anuual_report_list(df)
+
+# res_df.to_excel('사업보고서 제출기업.xlsx')
+rep_list = res_df["corp_code"].unique()
+
 def is_company_anuual_repot(corp_code):
-    if str(corp_code) in anual_report_list_group88_df["corp_code"].unique():
+    if str(corp_code) in rep_list:
         return "●"
     else:
-        return "-"
+        return ""
 
+df['사업보고서 제출여부'] = df['고유번호'].apply(is_company_anuual_repot)
+df.to_excel('사업보고서 추가.xlsx')
+group30_df.to_excel('32024년 30대그룹 집단 계열(사업보고서 제출여부).xlsx')
+
+if '01817106' in rep_list:
+    print("ddd")
 
 def exe_find_anual_reporting_comp500():
     """500대 기업 중 사업보고서 제출사 찾기"""

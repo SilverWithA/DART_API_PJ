@@ -1,9 +1,7 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
 import requests
-
-
-############ (주의) 보안상의 이유로 api키는 매서드 내 직접 정의하지 않음 유의(글로벌에 미리 정의해두고 매서드를 사용할 것)####################
+from library import api_key
 
 
 class Company_info_finder():
@@ -11,6 +9,7 @@ class Company_info_finder():
 
     def __init__(self):
         self.root = ET.parse('CORPCODE.xml').getroot()
+        self.api_key = api_key
 
     # 회사명으로 고유번호를 찾는 매서드
     def __fill_corp_code__(self, find_name):
@@ -33,19 +32,57 @@ class Company_info_finder():
         elif cnt == 1:
             return corp_code_list[0]
 
+    def __fill_jurir_no_by_corp_code__(self, corp_code):
+        """고유번호를 통해 법인등록번호 조회하여 고유번호가 유효한지 확인하는 매서드"""
+        if corp_code is None or corp_code == "-":
+            return
+
+        url = "https://opendart.fss.or.kr/api/company.json"
+
+        params = {
+            "crtfc_key": self.api_key,
+            "corp_code": corp_code,
+        }
+
+        res = requests.get(url, params=params)
+        data = res.json()
+
+        try:
+            if data['jurir_no']:
+                return str(data['jurir_no'])
+            else:
+                return "-"
+        except:
+            print(corp_code, "로 법인등록번호를 조회할 수 없습니다. 추가확인이 필요합니다.")
+
+    def __is_vaild_corp_code__(self, df):
+
+        df['법인등록번호2'] = df['고유번호'].apply(self.__fill_jurir_no_by_corp_code__)
+        df['고유번호 유효'] = df.apply(lambda row: str(row['법인등록번호']).replace(" ","").replace("-","")
+                                             == str(row['법인등록번호2']).replace(" ","").replace("-",""), axis=1)
+
+        return df
+
+
+
     def create_corp_code_col(self, df, input_col_name, output_col_name):
         print()
         print(" --------------", input_col_name,"을 이용하여 dart내 고유번호를 찾기 시작! ----------------- ")
         print(" --", output_col_name, "불러오는 중 ...")
 
-        df[output_col_name] = df[input_col_name].apply(self.__fill_corp_code__)
+        df[output_col_name] = df[input_col_name].apply(self.__fill_corp_code__) # 사명으로 고유번호 찾기
 
         print()
         print("총 ",len(df[output_col_name]),"개의 회사의 고유번호를 매핑 완료! --------")
         print(" - 고유번호 중복 회사: ", len(df[df[output_col_name].apply(lambda x: isinstance(x, list))]), "개")
         print(" - 사명으로 매핑 실패한 회사: ",len(df[df[output_col_name].isna()]),"개")
 
-        df = df.explode(output_col_name)  # 중복 고유번호를 원자화
+        df = df.explode(output_col_name)        # 중복 고유번호를 원자화
+
+
+        print(" - 고유번호 유효성 검증 작업중...")
+        df = self.__is_vaild_corp_code__(df)
+        print(" --- 고유번호 유효성 검증 완료 --- ")
         return df
 
     # 고유코드로 종목 코드 찾는 매서드

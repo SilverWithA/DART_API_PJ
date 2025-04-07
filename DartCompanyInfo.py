@@ -12,7 +12,7 @@ class Company_info_finder():
         self.api_key = api_key
 
     # 회사명으로 고유번호를 찾는 매서드
-    def __fill_corp_code__(self, find_name):
+    def __fill_corp_code_by_name__(self, find_name):
         """회사명으로 고유번호 찾는 매서드
             * find_name = 고유번호를 찾고자하는 회사명"""
 
@@ -21,7 +21,26 @@ class Company_info_finder():
         corp_code_list = []
 
         for country in self.root.iter("list"):
-            if country.findtext("corp_name") == find_name:
+            if country.findtext("corp_code") == find_name:
+                cnt += 1
+                corp_code_list.append(country.findtext("corp_code"))
+
+        if cnt > 1:
+
+            return corp_code_list
+
+        elif cnt == 1:
+            return corp_code_list[0]
+
+    def __fill_corp_code_by_stock__(self, find_stock):
+        """종목코드로 고유번호 찾는 매서드
+            * find_stcok = 고유번호를 찾고자하는 회사의 종목코드"""
+
+        cnt = 0
+        corp_code_list = []
+
+        for country in self.root.iter("list"):
+            if country.findtext("stock_code") == find_stock:
                 cnt += 1
                 corp_code_list.append(country.findtext("corp_code"))
 
@@ -65,12 +84,18 @@ class Company_info_finder():
 
 
 
-    def create_corp_code_col(self, df, input_col_name, output_col_name):
+    def create_corp_code_col(self, df, input_col_name, output_col_name, by):
         print()
         print(" --------------", input_col_name,"을 이용하여 dart내 고유번호를 찾기 시작! ----------------- ")
         print(" --", output_col_name, "불러오는 중 ...")
 
-        df[output_col_name] = df[input_col_name].apply(self.__fill_corp_code__) # 사명으로 고유번호 찾기
+        if by == "회사명":
+
+            df[output_col_name] = df[input_col_name].apply(self.__fill_corp_code_by_name__)
+
+        elif by == "종목코드":
+            df[output_col_name] = df[input_col_name].apply(self.__fill_corp_code_by_stock__)
+
 
         print()
         print("총 ",len(df[output_col_name]),"개의 회사의 고유번호를 매핑 완료! --------")
@@ -81,7 +106,7 @@ class Company_info_finder():
 
 
         print(" - 고유번호 유효성 검증 작업중...")
-        df = self.__is_vaild_corp_code__(df)
+        # df = self.__is_vaild_corp_code__(df)
         print(" --- 고유번호 유효성 검증 완료 --- ")
         return df
 

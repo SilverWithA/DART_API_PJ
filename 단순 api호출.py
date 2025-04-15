@@ -28,8 +28,8 @@ def 유상증자_콜렉팅(df, cnt = 0):
         try:
             params = {"crtfc_key": api_key,
                   "corp_code": corp_code,
-                  "bgn_de":'20200407',
-                  "end_de":"20220406"}
+                  "bgn_de":'20200101',
+                  "end_de":"20201231"}
 
 
             res = requests.get(url, params=params)
@@ -50,12 +50,12 @@ def 유상증자_콜렉팅(df, cnt = 0):
     print("총 ", cnt,"개 사의 유상증자 결정 정보를 모았습니다.")
     return res_df
 
-res_df = 유상증자_콜렉팅(df)
-res_df.to_excel('2개년 유상증자결정 콜렉팅_20250408.xlsx')
+res2020_df = 유상증자_콜렉팅(df)
+res2020_df.to_excel('2020년 유상증자결정 콜렉팅_20250409.xlsx')
 
 
 
-# corp_code = "01351080"
+corp_code = "01351080"
 def 유무상증자_콜렉팅(df, cnt = 0):
     url = "https://opendart.fss.or.kr/api/pifricDecsn.json"
 
@@ -79,8 +79,8 @@ def 유무상증자_콜렉팅(df, cnt = 0):
         try:
             params = {"crtfc_key": api_key,
                   "corp_code": corp_code,
-                  "bgn_de":'20200407',
-                  "end_de":"20220406"}
+                  "bgn_de":'20200101',
+                  "end_de":"20201231"}
 
 
             res = requests.get(url, params=params)
@@ -102,5 +102,59 @@ def 유무상증자_콜렉팅(df, cnt = 0):
     return res_df
 
 
-유무상_df = 유무상증자_콜렉팅(df)
-유무상_df.to_excel('2개년 유무상증자 콜렉팅.xlsx')
+유무상2020_df = 유무상증자_콜렉팅(df)
+유무상2020_df.to_excel('2020년 유무상증자 콜렉팅.xlsx')
+
+# corp_code= '00126380'
+
+def 전환사채발행결정_콜렉팅(df, cnt = 0):
+    url = "https://opendart.fss.or.kr/api/cvbdIsDecsn.json"
+
+
+    res_df = pd.DataFrame(columns=['rcept_no', 'corp_cls', 'corp_code', 'corp_name', 'bddd', 'od_a_at_t',
+       'od_a_at_b', 'adt_a_atn', 'fdpp_fclt', 'fdpp_bsninh', 'fdpp_op',
+       'fdpp_dtrp', 'fdpp_ocsa', 'fdpp_etc', 'ftc_stt_atn', 'bd_tm', 'bd_knd',
+       'bd_fta', 'atcsc_rmislmt', 'ovis_fta', 'ovis_fta_crn', 'ovis_ster',
+       'ovis_isar', 'ovis_mktnm', 'bd_intr_ex', 'bd_intr_sf', 'bd_mtd',
+       'bdis_mthn', 'cv_rt', 'cv_prc', 'cvisstk_knd', 'cvisstk_cnt',
+       'cvisstk_tisstk_vs', 'cvrqpd_bgd', 'cvrqpd_edd',
+       'act_mktprcfl_cvprc_lwtrsprc', 'act_mktprcfl_cvprc_lwtrsprc_bs',
+       'rmislmt_lt70p', 'abmg', 'sbd', 'pymd', 'rpmcmp', 'grint', 'rs_sm_atn',
+       'ex_sm_r', 'ovis_ltdtl'])
+
+    print(" --- 전환사채 결정 정보를 불러오는 중...")
+
+    # corp_code = "00126380"
+    cnt = 0
+    for index, corp_code in enumerate(df['고유번호']):
+        cnt += 1
+        if corp_code is None:
+            print(df['종목명'][index], "는 고유번호로 전환사채 정보를 찾을 수 없습니다.")
+            continue
+        try:
+            params = {"crtfc_key": api_key,
+                  "corp_code": corp_code,
+                  "bgn_de":'20200407',
+                  "end_de":"20250407"}
+
+
+            res = requests.get(url, params=params)
+            data = res.json()
+
+            if data['message'] == '조회된 데이타가 없습니다.':
+                continue
+
+            if data['list']:
+                tmp = pd.DataFrame(data['list'])
+                res_df = pd.concat([res_df, tmp], ignore_index=True)
+
+            cnt += 1
+        except Exception as e:
+            print(e, end=' ')
+            print(df['종목명'][index], "의 전환사채 결정 호출중 에러가 발생했습니다.")
+
+    print("총 ", cnt,"개 사의 전환사채 결정 정보를 모았습니다.")
+    return res_df
+
+전환사채결정_df = 전환사채발행결정_콜렉팅(df)
+전환사채결정_df.to_excel('2020-2025 전환사채 결정.xlsx')

@@ -132,9 +132,9 @@ def __save_unique_rawDEF14A__(flr_nm, rcept_no,filenames):
     print(flr_nm, "의 주총공고 ", rcept_no,"를 저장했습니다.")
 def save_unique_def14a(filenames):
     comp500_proxy_info = proxy_info.loc[proxy_info['500대기업 여부'] == "●"]
-    # group88_proxy_info = proxy_info.loc[proxy_info['대규모기업집단 여부'] == "●"]
+    group88_proxy_info = proxy_info.loc[proxy_info['대규모기업집단 여부'] == "●"]
 
-
+    group88_proxy_info.to_excel('250310-20250318 주총공고.xlsx')
     # 500대 기업
     comp500_proxy_info.apply(lambda x: __save_unique_rawDEF14A__(x.flr_nm, x.rcept_no,filenames), axis=1)
     # group88_proxy_info.apply(lambda x: __save_unique_rawDEF14A__(x.flr_nm, x.rcept_no,filenames), axis=1)

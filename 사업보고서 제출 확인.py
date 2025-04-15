@@ -3,7 +3,7 @@
 ### 1. 데이터 불러오기
 def test_df():
     # 30대그룹 데이터 불러오기(불러오기 전 컬럼 별 타입 지정 필요)
-    group88_df = pd.read_excel('2024 대규모기업집단 현황(고유번호 및 종목코드 포함).xlsx',
+    group88_df = pd.read_excel('2024 88개 대규모기업집단 계열사.xlsx', sheet_name='2024 대규모기업집단 계열사 목록',
                                dtype={
                                    "연번": int,
                                    "법인등록번호": str,
@@ -63,6 +63,8 @@ def collect_anuual_report_list(df):
             res_df = pd.concat([res_df, new_data], ignore_index=True)
         except Exception as e:
             print("에러 발생: ",e, "에러 발생 구역의 고유번호: ",corp_code)
+
+        print(res_df)
 
     print("정기 보고서 불러오기 작업 완료----------------------------------")
 

@@ -52,6 +52,10 @@ class Company_info_finder():
         elif cnt == 1:
             return corp_code_list[0]
 
+    def test_apply(self, df, input_col, output_col, method):
+        df[output_col] = df[str(input_col)].apply(self.method)
+
+
     def __check_jur_no__(self):
         pass
 

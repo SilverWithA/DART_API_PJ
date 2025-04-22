@@ -8,8 +8,6 @@ class Info_API_Collecter:
 
     def get_corpcode_by_name(self, input_name):
         """회사명으로 고유번호 찾는 매서드"""
-
-        # 하나의 사명으로 고유번호가 여러개인 경우까지 처리
         cnt = 0
         corp_code_list = []
 
@@ -30,4 +28,23 @@ class Info_API_Collecter:
         """이름으로 고유번호 찾기 매서드를 전체 df 컬럼에 적용"""
         df['고유번호'] = df[str(input_col)].apply(self.get_corpcode_by_name)
 
+    def get_corpcode_by_stock(self, input_stock):
+        """종목코드로 DART 고유번호를 찾는 매서드"""
+        cnt = 0
+        corp_code_list = []
 
+        for country in self.corp_code_xml.iter("list"):
+            if country.findtext("stock_code") == input_stock:
+                cnt += 1
+                corp_code_list.append(country.findtext("corp_code"))
+
+        if cnt > 1:
+
+            return corp_code_list
+
+        elif cnt == 1:
+            return corp_code_list[0]
+
+    def apply_get_corpcode_by_stock(self, df, input_col):
+        """이름으로 고유번호 찾기 매서드를 전체 df 컬럼에 적용"""
+        df['고유번호'] = df[str(input_col)].apply(self.get_corpcode_by_stock)

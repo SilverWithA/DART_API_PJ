@@ -142,3 +142,6 @@ class Info_API_Collecter:
 
 
 
+    # 법인등록번호 비교하는 매서드추가필요
+
+

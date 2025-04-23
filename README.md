@@ -1,6 +1,7 @@
+### (new)MVC 구조로 리팩토링
 
-## 프로그램 구조
-![Uploading DART API 이용을 위한 기본정보.png…]()
+
+
 
 ### DartCompInfo: 기본정보 조회 클래스
 |No|매서드|비고|

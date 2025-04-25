@@ -1,12 +1,23 @@
 ### (new)MVC 구조로 리팩토링
 ### 파일트리
 project_DART
-||패키지||
+|MVC레벨|모듈명|설명|
 |------|---|---|
 |controller|||
 |model|Info_API_collector|기본 정보를 불러오는 모델|
 |model|Director_API_collector|임원 현황을 불러오는 모델|
 |model|statement_API_collector|재무제표를 불러오는 모델|
+
+### Info_API_collector: 기본정보를 불러오는 모델
+
+|클래스|매서드|매서드 설명|
+|------|---|---|
+|xml 파일||xml 파일로 기본 정보를 찾는 클래스|
+||매서드 1|xml 파일최신 정보로 업데이트하는 클래스|
+||매서드 2|xml파일 기반 회사명으로 고유번호 찾기|
+||매서드 3|xml파일 기반 회사명으로 종목코드 찾기|
+
+
 
 ### DartCompInfo: 기본정보 조회 클래스
 |No|매서드|비고|

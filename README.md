@@ -1,5 +1,11 @@
 ### (new)MVC 구조로 리팩토링
-
+### 파일트리
+project_DART
+||패키지||
+|------|---|---|
+|app|controller||
+||model|Info_API_collector|
+||model|Director_API_collector|
 
 
 

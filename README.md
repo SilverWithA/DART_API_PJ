@@ -3,11 +3,10 @@
 project_DART
 ||패키지||
 |------|---|---|
-|app|controller||
-||model|Info_API_collector|
-||model|Director_API_collector|
-
-
+|controller|||
+|model|Info_API_collector|기본 정보를 불러오는 모델|
+|model|Director_API_collector|임원 현황을 불러오는 모델|
+|model|statement_API_collector|재무제표를 불러오는 모델|
 
 ### DartCompInfo: 기본정보 조회 클래스
 |No|매서드|비고|

@@ -19,9 +19,9 @@
 ||apply_corpcode_by_name|찾은 정보를 기반으로 '고유번호' 컬럼 추가하기|
 ||get_corpcode_by_stock|xml파일 기반 종목코드로 고유번호 찾기|
 ||apply_get_corpcode_by_stock|찾은 정보를 기반으로 '고유번호' 컬럼 추가하기|
-||print_stockcode_by_name|xml파일 기반 종목코드로 회사명 출력 보기|
-||추가필요|xml파일 기반 회사명으로 기본정보 출력 보기|
-||추가필요|xml파일 기반 고유번호로 기본정보 출력 보기|
+||print_Info_by_name|xml파일 기반 종목코드로 회사명 출력 보기|
+||print_Info_by_stock|xml파일 기반 회사명으로 기본정보 출력 보기|
+||print_Info_by_corpcode|xml파일 기반 고유번호로 기본정보 출력 보기|
 
 ### (2) API_info_collector: API를 통해 직접 기본정보에 관한 사항을 불러오는 클래스
 |클래스|매서드|설명|

@@ -9,12 +9,29 @@
 
 ## Model
 ## Info_collerctor.py
+
+### (1) recent_overview_updater: 기업개황정보 데이터베이스에 업데이트
+
+|클래스|매서드|매서드 설명|
+|------|---|---|
+|recent_overview_updater||[기업개황](https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS001&apiId=2019002) 내에 있는 기본정보를 불러와 저장하고 데이터베이스 내 기업개황 정보를 최신데이터로 업데이트하는 클래스 |
+||추가필요|xml 파일최신 정보로 업데이트하는 클래스|
+||get_corpcode_by_name|xml파일 기반 회사명으로 고유번호 찾기|
+||apply_corpcode_by_name|찾은 정보를 기반으로 '고유번호' 컬럼 추가하기|
+||get_corpcode_by_stock|xml파일 기반 종목코드로 고유번호 찾기|
+||apply_get_corpcode_by_stock|찾은 정보를 기반으로 '고유번호' 컬럼 추가하기|
+||print_Info_by_name|xml파일 기반 종목코드로 회사명 출력 보기|
+||print_Info_by_stock|xml파일 기반 회사명으로 기본정보 출력 보기|
+||print_Info_by_corpcode|xml파일 기반 고유번호로 기본정보 출력 보기|
+
+
+
 ### (1) xml_info_finder: 기본정보를 불러오는 클래스
 
 |클래스|매서드|매서드 설명|
 |------|---|---|
-|xml_info_finder||[기업개황](https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS001&apiId=2019002) 내에 있는 기본정보를 불러오는 클래스 |
-||추가필요|xml 파일최신 정보로 업데이트하는 클래스|
+|xml_info_finder||데이터베이스 내 기업개황정보를 기반으로 기본정보를 찾는 클래스|
+||생성자|데이터베이스 내 테이블을 불러와 self값으로 저장(xml. ET형식으로 되어있으므로 아래 매서드 리팩토링 필요)|
 ||get_corpcode_by_name|xml파일 기반 회사명으로 고유번호 찾기|
 ||apply_corpcode_by_name|찾은 정보를 기반으로 '고유번호' 컬럼 추가하기|
 ||get_corpcode_by_stock|xml파일 기반 종목코드로 고유번호 찾기|

@@ -20,7 +20,10 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+from selenium.webdriver.chrome.service import Service
+service = Service(executable_path=r"C:\Users\psych\Desktop\Dartpj\chromedriver-win64\chromedriver-win64\chromedriver.exe")
 import time
+import datetime
 
 # 1. ChromeOptions 설정
 chrome_options = Options()
@@ -41,6 +44,7 @@ df = pd.read_excel('500대기업 소팅 감사보고서 매출액, 영업이익.
 # res_df = pd.DataFrame(columns=column_names)
 # total = len(is_final_df)
 for idx, rept_no in enumerate(is_final_df['rcept_no']):
+    start = time.time()
     print(idx,"/",total,"-", round(idx/total*100,1),"%")
 
     try:
@@ -76,7 +80,8 @@ rept_no= '20250508000219'
 
 # 연결 아닌 녀석들 먼저 수집
 df = df[df['연결여부'] != "1"]
-df = df.iloc[:4000]
+df = df[df['크롤링 완료'] == "x"]
+df = df.iloc[:1000]
 error_list = []
 
 column_names = ['접수번호', '회사명', '테이블순번', 'dummy3', 'dummy4', 'dummy5', 'dummy6', 'dummy7', 'dummy8', 'dummy9'
@@ -89,11 +94,11 @@ raw_tables = pd.DataFrame(columns=column_names)
 total = len(df)
 
 for idx, rept_no in enumerate(df['rcept_no']):
-    print(idx,"/",total,"-", round(idx/total*100,1),"%")
+    start = time.time()
 
     try:
 
-        driver = webdriver.Chrome(options=chrome_options)
+        driver = webdriver.Chrome(options=chrome_options, service=service)
         # driver = webdriver.Chrome() # 테스트용 코드
         driver.get(f"https://dart.fss.or.kr/dsaf001/main.do?rcpNo={rept_no}")
 
@@ -129,8 +134,17 @@ for idx, rept_no in enumerate(df['rcept_no']):
             tmp_df = pd.DataFrame(data= tmp, columns=column_names)
             raw_tables = pd.concat([raw_tables,tmp_df],axis=0)
 
+            end = time.time()
+            result = str(datetime.timedelta(seconds=end-start)).split('.')[0]
+            print(idx, "/", total, "-", round(idx / total * 100, 1), "% - ",result)
+
+
     except:
         error_list.append(rept_no)
         driver.quit()
         continue
-raw_tables.to_excel('raw 감사보고서 part1.xlsx', index=False)
+
+# 데이터 로컬 저장
+raw_tables.to_excel('raw 감사보고서 part2.xlsx', index=False)
+error_df = pd.DataFrame(error_list)
+error_df.to_excel('에러 part2')

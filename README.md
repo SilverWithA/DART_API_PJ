@@ -3,7 +3,7 @@
 |MVC레벨|모듈명|설명|
 |------|---|---|
 |controller|-|-|
-|model|Info_API_collector|기본 정보를 불러오는 모델|
+|model|Info_API_collector|기본 정보(DART 기업개황)를 불러오는 모델|
 |model|Director_API_collector|임원 현황을 불러오는 모델|
 |model|statement_API_collector|재무제표를 불러오는 모델|
 
